@@ -24,6 +24,18 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
+/**
+ * ProductDetail component displays detailed information about a selected product.
+ *
+ * @component
+ * @example
+ * <ProductDetail />
+ *
+ * @returns {Object} - Contains the reactive properties and methods for the component.
+ * @returns {Ref<Object|null>} product - The detailed information of the product.
+ * @returns {Ref<boolean>} loading - A boolean indicating whether the product data is loading.
+ * @returns {Ref<string|null>} error - The error message if the data fetching fails.
+ */
 export default {
   name: "ProductDetail",
   setup() {
@@ -34,6 +46,12 @@ export default {
     const loading = ref(true);
     const error = ref(null);
 
+    /**
+     * Fetches product details from the API.
+     * 
+     * @param {string} id - The ID of the product to fetch.
+     * @returns {Promise<void>} - A promise that resolves when the product data is fetched.
+     */
     const fetchProduct = async (id) => {
       try {
         const response = await fetch(`https://fakestoreapi.com/products/${id}`);
@@ -65,6 +83,9 @@ export default {
 </script>
 
 <style scoped>
+/**
+ * Styles for the ProductDetail component.
+ */
 .product-detail-container {
   max-width: 500px;
   margin: 20px auto;
