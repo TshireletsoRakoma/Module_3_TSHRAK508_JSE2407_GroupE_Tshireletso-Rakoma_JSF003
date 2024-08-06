@@ -1,0 +1,136 @@
+<template>
+    <div class="p-6">
+      <div class="mb-4 flex space-x-4">
+        <!-- Sorting Dropdown -->
+        <select v-model="sorting" class="p-2 border rounded" @change="saveStateToLocalStorage">
+          <option value="default">Default</option>
+          <option value="low">Price: Low to High</option>
+          <option value="high">Price: High to Low</option>
+        </select>
+  
+        <!-- Search Input -->
+        <input
+          type="text"
+          v-model="searchTerm"
+          placeholder="Search products..."
+          class="p-2 border rounded"
+          @input="saveStateToLocalStorage"
+        />
+  
+        <!-- Categories Dropdown -->
+        <select v-model="filterItem" class="p-2 border rounded" @change="saveStateToLocalStorage">
+          <option value="All categories">All categories</option>
+          <option v-for="category in categories" :key="category" :value="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+  
+      <!-- Display Loading, Error, or Products -->
+      <div v-if="loading">
+        <p>Loading...</p>
+      </div>
+      <div v-else-if="error">
+        <p class="text-red-500">{{ error }}</p>
+      </div>
+      <div v-else-if="filteredProducts.length === 0">
+        <p>No products available.</p>
+      </div>
+      <div v-else class="grid-container">
+        <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product" />
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  import { ref, computed, onMounted } from "vue";
+  import ProductCard from "./ProductCard.vue";
+  
+  export default {
+    name: "ProductList",
+    components: {
+      ProductCard,
+    },
+    setup() {
+      // Reactive properties
+      const products = ref([]);
+      const loading = ref(true);
+      const error = ref(null);
+      const categories = ref([]);
+      const searchTerm = ref(localStorage.getItem("searchTerm") || "");
+      const sorting = ref(localStorage.getItem("sorting") || "default");
+      const filterItem = ref(localStorage.getItem("filterItem") || "All categories");
+  
+      // Fetch products from API
+      const fetchProducts = async () => {
+        loading.value = true;
+        error.value = null;
+        try {
+          const response = await fetch("https://fakestoreapi.com/products");
+          if (!response.ok) {
+            throw new Error("Failed to fetch products");
+          }
+          const data = await response.json();
+          products.value = data;
+          const uniqueCategories = [...new Set(data.map((product) => product.category))];
+          categories.value = uniqueCategories;
+        } catch (err) {
+          error.value = err.message;
+        } finally {
+          loading.value = false;
+        }
+      };
+  
+      // Computed property for filtering and sorting products
+      const filteredProducts = computed(() => {
+        let filtered = products.value.filter(
+          (product) =>
+            product.title.toLowerCase().includes(searchTerm.value.toLowerCase()) &&
+            (filterItem.value === "All categories" || product.category === filterItem.value)
+        );
+  
+        if (sorting.value === "low") {
+          filtered.sort((a, b) => a.price - b.price);
+        } else if (sorting.value === "high") {
+          filtered.sort((a, b) => b.price - a.price);
+        }
+  
+        return filtered;
+      });
+  
+      // Save state to local storage
+      const saveStateToLocalStorage = () => {
+        localStorage.setItem("searchTerm", searchTerm.value);
+        localStorage.setItem("sorting", sorting.value);
+        localStorage.setItem("filterItem", filterItem.value);
+      };
+  
+      // Fetch products when component is mounted
+      onMounted(() => {
+        fetchProducts();
+      });
+  
+      // Expose reactive data and computed properties to the template
+      return {
+        products,
+        loading,
+        error,
+        categories,
+        searchTerm,
+        sorting,
+        filterItem,
+        filteredProducts,
+        saveStateToLocalStorage,
+      };
+    },
+  };
+  </script>
+  
+  <style scoped>
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  </style>
+  
