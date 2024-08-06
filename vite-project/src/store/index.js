@@ -35,6 +35,8 @@ const store = createStore({
     sorting: (state) => state.sorting,
     filterItem: (state) => state.filterItem,
   },
+
+  
 });
 
 export default store;
