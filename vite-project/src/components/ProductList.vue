@@ -1,8 +1,12 @@
 <template>
   <div class="p-6">
-    <div class="mb-4 flex space-x-4">
+    <div class="controls mb-4 flex flex-wrap gap-4">
       <!-- Sorting Dropdown -->
-      <select v-model="sorting" class="p-2 border rounded" @change="saveStateToLocalStorage">
+      <select
+        v-model="sorting"
+        class="control-item p-2 border rounded"
+        @change="saveStateToLocalStorage"
+      >
         <option value="default">Default</option>
         <option value="low">Price: Low to High</option>
         <option value="high">Price: High to Low</option>
@@ -13,12 +17,16 @@
         type="text"
         v-model="searchTerm"
         placeholder="Search products..."
-        class="p-2 border rounded"
+        class="control-item p-2 border rounded flex-1"
         @input="saveStateToLocalStorage"
       />
 
       <!-- Categories Dropdown -->
-      <select v-model="filterItem" class="p-2 border rounded" @change="saveStateToLocalStorage">
+      <select
+        v-model="filterItem"
+        class="control-item p-2 border rounded"
+        @change="saveStateToLocalStorage"
+      >
         <option value="All categories">All categories</option>
         <option v-for="category in categories" :key="category" :value="category">
           {{ category }}
@@ -37,7 +45,11 @@
       <p>No products available.</p>
     </div>
     <div v-else class="grid-container">
-      <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product" />
+      <ProductCard
+        v-for="product in filteredProducts"
+        :key="product.id"
+        :product="product"
+      />
     </div>
   </div>
 </template>
@@ -158,9 +170,31 @@ export default {
 /**
  * Styles for the ProductList component.
  */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.control-item {
+  flex: 1;
+  min-width: 150px;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .controls {
+    flex-wrap: nowrap;
+  }
+
+  .control-item {
+    flex: none;
+    width: auto;
+  }
 }
 </style>

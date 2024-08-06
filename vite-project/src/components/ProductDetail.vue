@@ -176,4 +176,26 @@ export default {
     transform: rotate(360deg);
   }
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .product-detail-container {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .product-title {
+    font-size: 1.25rem;
+  }
+
+  .product-price {
+    font-size: 1rem;
+  }
+
+  .back-link {
+    bottom: 10px;
+    left: 10px;
+    padding: 8px 16px;
+  }
+}
 </style>
